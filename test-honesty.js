@@ -14,6 +14,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { keysTheAppReads } = require('./app_reads');
 const { FIELDS, PROTECTED } = require('./keys.js');
 
 // The app this panel publishes to. prox (Firebase waforall-2024) sits two
@@ -79,24 +80,13 @@ if (constants === null || configs === null) {
 // A key is "wired" when the app both names it and has a getter reaching for
 // that name. Either alone is not enough: a constant nobody reads is dead, and
 // a getter is what actually pulls the value out of Remote Config.
+// Delegated to app_reads.js: "the app reads it" means a published value can
+// reach a device, not that a getter exists. This file and test-validate each
+// had their own answer, and the two drifted.
+const APP_READS = keysTheAppReads();
+
 function isWired(key) {
-  // Resolve the Dart constant NAME that carries this Remote Config key, then
-  // look for a getter reaching for that name. Matching `Constants.<key>`
-  // directly assumed the two are spelled the same; prox reads the key
-  // "purchaseProductIds" through a constant called `sharedPurchaseIds`, and
-  // that assumption reported a live key as dead.
-  const re = /static const String\s+(\w+)\s*=\s*['"]([^'"]+)['"]/g;
-  let m;
-  const constNames = [];
-  while ((m = re.exec(constants))) {
-    if (m[2] === key) constNames.push(m[1]);
-  }
-  if (!constNames.length) return false;
-  return constNames.some((n) =>
-    new RegExp(
-      '(?:remoteConfig\\.get\\w+|_(?:flag|flagOrNull|str|posInt|nonNegInt|localized|idList|stringMap|url))\\(\\s*Constants\\.' + n + '\\b'
-    ).test(configs)
-  );
+  return APP_READS !== null && APP_READS.has(key);
 }
 
 const wrong = [];

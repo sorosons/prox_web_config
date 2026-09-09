@@ -14,6 +14,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { keysTheAppReads } = require('./app_reads');
 const { FIELDS, PROTECTED, BY_KEY } = require('./keys');
 
 const ALLOWED = new Set(FIELDS.map((f) => f.key));
@@ -89,8 +90,6 @@ check('the presentation-mode tab list matches the app', () => {
   // The panel names the exact tabs each mode shows. That is the kind of
   // detail that reads as authoritative and rots silently: it said "ikili
   // sohbet gizlenir" while the app kept that tab in BOTH modes.
-  const fs = require('fs');
-  const path = require('path');
   const view = path.join(
     __dirname,
     '..',
@@ -290,18 +289,14 @@ check('notWired marks exactly the keys the app has no getter for', () => {
   let m;
   while ((m = re.exec(src))) names[m[1]] = m[2];
 
-  // Only a getter counts as "the app reads it". A key listed in the defaults
-  // map is registered with Remote Config but never fetched by anything, so
-  // publishing it changes nothing on a device -- exactly what notWired means.
-  // Matching every Constants.X in the file counted those defaults as reads.
-  const read = new Set();
-  const helperSrc = fs.readFileSync(helper, 'utf8');
-  // Both reading styles count: the raw remoteConfig.getX(Constants.foo) and
-  // the tri-state reader family (_flag/_str/_posInt/...) that replaced it.
-  // Matching only the raw form reported every converted getter as missing.
-  const re2 = /(?:remoteConfig\.get\w+|_(?:flag|flagOrNull|str|posInt|nonNegInt|localized|idList|stringMap|url))\(\s*Constants\.(\w+)/g;
-  while ((m = re2.exec(helperSrc))) {
-    if (names[m[1]]) read.add(names[m[1]]);
+  // "The app reads it" means a published value can reach a device, not that
+  // a getter exists. The rule lives in app_reads.js so this check and
+  // test-honesty cannot drift apart again -- they did, and twenty-five inert
+  // keys were advertised as working for it.
+  const read = keysTheAppReads();
+  if (!read) {
+    console.log('      (uygulama deposu yok, atlandı)');
+    return;
   }
 
   for (const f of FIELDS) {
@@ -313,7 +308,7 @@ check('notWired marks exactly the keys the app has no getter for', () => {
     }
     if (!appReads && !f.notWired) {
       assert.fail(
-        `${f.key}: the app has no getter for it — add notWired: true in keys.js`
+        `${f.key}: nothing on a device reads it — add notWired: true in keys.js`
       );
     }
   }
