@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+test-server.js
+test-validate.js
+# Never bake the service account into an image: an image can be pushed to a
+# registry, exported, or inspected layer by layer. It is mounted at run time.
+*service-account*.json
+*.credentials.json
+.env

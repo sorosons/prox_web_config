@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prox Admin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login" class="gate">
+  <form id="loginForm" class="card">
+    <h1>Prox Admin</h1>
+    <p class="muted">Firebase Remote Config</p>
+    <label for="pw">Panel şifresi</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <button type="submit">Giriş</button>
+    <p id="loginErr" class="err" hidden></p>
+  </form>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <div>
+      <h1>Prox Admin</h1>
+      <p class="muted" id="versionLine">yükleniyor…</p>
+    </div>
+    <div class="headActions">
+      <button id="reload" class="ghost" type="button">Yenile</button>
+      <button id="logout" class="ghost" type="button">Çıkış</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="edit" type="button">Ayarlar</button>
+    <button class="tab" data-tab="docs" type="button">Ne neyi etkiler?</button>
+  </nav>
+
+  <main id="tab-edit">
+    <div class="notice">
+      <strong>Boş = uygulamanın kendi varsayılanı.</strong>
+      Bir alanı boş bırakıp yayınlarsan o anahtar Remote Config'ten
+      <b>silinir</b> ve uygulama kendi varsayılanına döner. Boş, "kapalı"
+      demek değildir: varsayılanı açık olan bir şey açık kalır.
+      <br>
+      Dikkat: daha önce oraya bir değer yayınladıysan, alanı boşaltıp
+      yayınlamak o değeri <b>geri alır</b> — yani boş bırakmak her zaman
+      "dokunmamak" değildir. Hiçbir şeyi değiştirmek istemiyorsan
+      o bölümü hiç yayınlama.
+      <br>
+      Her bölümün kendi <b>Bu bölümü yayınla</b> düğmesi var ve sadece o
+      bölümün anahtarlarını gönderir; diğer bölümlere dokunmaz.
+    </div>
+
+    <div class="editLayout">
+      <nav id="groupTabs" class="groupTabs" aria-label="Bölümler"></nav>
+      <section id="groups"></section>
+    </div>
+
+    <div class="stickyBar">
+      <button id="save" type="button"
+              title="Tüm bölümleri tek seferde yayınlar">
+        Hepsini yayınla
+      </button>
+      <button id="resetAll" class="ghost" type="button"
+              title="Tüm alanları boşaltır; yayınlarsan her anahtar uygulama varsayılanına döner">
+        Hepsini sıfırla
+      </button>
+      <span id="status" class="status"></span>
+    </div>
+
+    <details class="protected">
+      <summary>Bu panelin <em>değiştiremediği</em> anahtarlar</summary>
+      <p class="muted">
+        Aşağıdakiler sadece okunur: gizli anahtarlar, abonelik ürün
+        kimlikleri ve konsoldan yönetilen bağlantılar. Sunucu bunlara gelen yazma isteğini
+        reddeder. Değiştirmen gerekirse Firebase konsolundan yaparsın.
+        (<code>isAllFeatureClosed</code>, <code>appVersion</code> ve
+        <code>appBuildNumber</code> artık burada değil — üçü de panelde
+        <i>Sunum modu</i> bölümünde, yazılabilir.)
+      </p>
+      <table id="protectedTable"><tbody></tbody></table>
+    </details>
+  </main>
+
+  <main id="tab-docs" hidden>
+    <div class="doc">
+      <h2>Sunum modu: <code>isFeaturesClose</code></h2>
+      <p>
+        Uygulamanın hangi yüzünü göstereceğini belirleyen tek karar. Formül
+        şudur — iki yoldan biri sağlanırsa devreye girer:
+      </p>
+      <pre>isFeaturesClose = isAllFeatureClosed
+                  || (appVersion == uygulamanın sürümü
+                      &amp;&amp; appBuildNumber == uygulamanın build numarası)</pre>
+      <ul>
+        <li>
+          <b>Herkes için:</b> <code>isAllFeatureClosed = true</code> →
+          bütün cihazlarda devreye girer. Bu anahtar
+          <b>panelde <i>Sunum modu</i> bölümünde</b>, yazılabilir.
+        </li>
+        <li>
+          <b>Tek bir sürüm için:</b> <code>appVersion</code> ve
+          <code>appBuildNumber</code> <em>ikisi birden</em> hedef sürümle
+          birebir eşleşirse yalnızca o build'de devreye girer. Bu iki alan da
+          <b>Sunum modu</b> bölümünde, anahtarın hemen altında.
+        </li>
+      </ul>
+
+      <h3>Adı yanıltıcı: hiçbir şey kapanmıyor</h3>
+      <p>
+        Anahtarın adı "tüm özellikler kapalı" der ama uygulama kodunda olan
+        bu değil. Devreye girdiğinde <b>alt menüdeki sekmeler değişir</b> ve
+        uygulama WhatsApp'sız bir araç setine benzer:
+      </p>
+      <table class="ruleTable">
+        <tr><th></th><th>Kapalıyken (normal)</th><th>Açıkken (sunum modu)</th></tr>
+        <tr><td>1</td><td>Durum</td><td>Yapay zekâ</td></tr>
+        <tr><td>2</td><td>Sohbetler</td><td>Hikaye oluşturucu</td></tr>
+        <tr><td>3</td><td>İkili sohbet</td><td>Ses editörü</td></tr>
+        <tr><td>4</td><td>Profiller</td><td>İkili sohbet</td></tr>
+        <tr><td>5</td><td>Ses editörü</td><td>Ayarlar</td></tr>
+      </table>
+      <p>Bunlarla birlikte:</p>
+      <ul>
+        <li><b>İkili sohbet (WhatsApp Web) her iki modda da durur</b> — sadece
+          içindeki ayarlar düğmesi ve "premium'a geç" kaplaması gizlenir.</li>
+        <li>Abonelik ekranındaki özellik listesi değişir: silinen mesaj ve
+          profil vaatleri yerine reklamsızlık, hikaye ve yapay zekâ gelir.</li>
+        <li>Ayarlar'da SSS bağlantısı gizlenir.</li>
+        <li>Kayıtlı hiçbir veri silinmez. <code>false</code> yapınca her şey
+          aynen geri gelir.</li>
+      </ul>
+      <p class="warn">
+        <b>Sürüm bazlı yolu kullanırken dikkat:</b> <code>appVersion</code> ve
+        <code>appBuildNumber</code> <em>ikisinin de</em> birebir eşleşmesi
+        gerekir. Birini yanlış yazarsan hiçbir cihazda devreye girmez ve
+        panelden bunu anlamanın yolu yoktur — bir şey olmaması ile yanlış
+        yazmış olmak aynı görünür. Değerleri App Store Connect'teki build'den
+        kopyala, tahmin etme. İş bitince iki alanı da boşalt: build yayında
+        kaldığı sürece o sürümü kullanan herkes sunum modunda kalır.
+      </p>
+
+      <h2>Anahtarlar</h2>
+      <div id="docFields"></div>
+
+      <h2>"Sıfırla" ne yapar?</h2>
+      <p>
+        Her bölümün başındaki <b>Bu bölümü sıfırla</b> ve alttaki
+        <b>Hepsini sıfırla</b> düğmeleri <em>sadece formu boşaltır</em>.
+        Firebase'e o anda hiçbir şey yazılmaz.
+      </p>
+      <ul>
+        <li>Vazgeçtiysen <b>Yenile</b>'ye bas; canlı değerler geri gelir.</li>
+        <li>Uygulamak istiyorsan <b>Yayınla</b>'ya bas; o anahtarlar Remote
+          Config'ten silinir ve uygulama her biri için kendi varsayılanına döner.</li>
+      </ul>
+      <p class="warn">
+        Sıfırlamak "her şeyi kapat" demek değildir. Varsayılanı <em>açık</em>
+        olan bir özellik (örneğin ikili sohbet) sıfırlandığında açık kalır;
+        varsayılanı <em>kapalı</em> olan (reklamlar, açılış paywall'ı) kapanır.
+        Her alanın altındaki "Boş bırakılırsa:" satırı hangisi olduğunu söyler.
+      </p>
+
+      <h2>{code} yer tutucusu</h2>
+      <p>
+        Eşleşme kodu bildiriminin gövdesine <code>{code}</code> yazarsan,
+        uygulama oraya gerçek kodu koyar:
+      </p>
+      <pre>"Lütfen {code} girin"   →   "Lütfen 1234-5678 girin"</pre>
+      <p>
+        <code>{code}</code> yazmayı unutursan kod yine de alt satıra eklenir —
+        bildirimin tek işi kodu taşımak, kazara silinmesi kabul edilmiyor.
+        <code>{kod}</code> ve <code>{CODE}</code> yazımları da çalışır.
+      </p>
+
+      <h2>Dil seçimi</h2>
+      <p>
+        <b>Dile göre metin</b> alanı bir JSON nesnesi alır:
+      </p>
+      <pre>{
+  "tr": { "title": "Bağlantı kodun", "body": "Lütfen {code} girin" },
+  "en": { "title": "Your link code", "body": "Enter {code} in WhatsApp" }
+}</pre>
+      <p>
+        Bölge etiketleri temel dile eşleşir: <code>"pt"</code> girdisi
+        <code>pt_BR</code> cihazları da kapsar. Kısayol olarak sadece gövde
+        yazmak istersen <code>"tr": "Lütfen {code} girin"</code> yeterli.
+      </p>
+      <p>Metin seçilirken sıra şudur, ilk dolu olan kazanır:</p>
+      <ol>
+        <li>Dile göre metin (cihazın diline uyan girdi)</li>
+        <li>Tek başlık/gövde alanları</li>
+        <li>Uygulamanın kendi çevirisi</li>
+      </ol>
+      <p>
+        Başlık ve gövde <em>ayrı ayrı</em> çözülür — sadece gövdeyi doldurman
+        başlığı boşaltmaz.
+      </p>
+
+      <h2>Ücretsiz kullanıcı hatırlatıcısı ne zaman gider?</h2>
+      <p>Her koşul <em>ayrı ayrı</em> sağlanmak zorunda:</p>
+      <table class="ruleTable">
+        <tr><th>Koşul</th><th>Anlamı</th></tr>
+        <tr><td>Açık mı</td><td><code>freeNotifEnabled = true</code> olmalı. Varsayılan kapalı.</td></tr>
+        <tr><td>Abone değil</td><td>Abone veya deneme sürümündeki kullanıcıya <b>asla</b> gitmez.</td></tr>
+        <tr><td>İlk gecikme geçti</td><td>İlk açılıştan <code>freeNotifInitialDelayHours</code> saat geçmiş olmalı.</td></tr>
+        <tr><td>Kampanya penceresi</td><td>İlk açılıştan <code>freeNotifCampaignDays</code> gün geçtiyse durur.</td></tr>
+        <tr><td>Toplam adet</td><td>Kullanıcı ömür boyu en fazla <code>freeNotifMaxCount</code> tane alır.</td></tr>
+        <tr><td>Aralık</td><td>Öncekinden bu yana <code>freeNotifIntervalHours</code> saat geçmiş olmalı.</td></tr>
+      </table>
+      <p class="warn">
+        Bu kontrol bildirim gönderileceği anda yapılır, önceden zamanlanmaz.
+        Sebebi: günler önce sıraya alınmış bir bildirim, kullanıcının bu arada
+        abone olduğunu göremez ve para ödeyen birine "premium ol" derdi.
+      </p>
+
+      <h2>Zorunlu güncelleme ile kill switch farkı</h2>
+      <p>
+        İkisi de eski sürümleri hedefler ama sonuçları farklıdır:
+      </p>
+      <table class="ruleTable">
+        <tr><th></th><th>Kill switch (bu panelde yok)</th><th>Zorunlu güncelleme</th></tr>
+        <tr>
+          <td>Anahtar</td>
+          <td><code>appVersion</code> + <code>appBuildNumber</code></td>
+          <td><code>minSupportedVersion</code> + <code>forceUpdate</code></td>
+        </tr>
+        <tr>
+          <td>Etkisi</td>
+          <td>Özellikler kapanır, kullanıcıya açıklama yok</td>
+          <td>Güncelleme ekranı çıkar, mağazaya yönlendirir</td>
+        </tr>
+        <tr>
+          <td>Eşleşme</td>
+          <td>Sürüm <em>birebir</em> eşleşirse</td>
+          <td>Sürüm <em>bundan düşükse</em></td>
+        </tr>
+      </table>
+      <p class="warn">
+        <code>minSupportedVersion</code>'ı mağazadaki en güncel sürümün üstüne
+        yazma. O zaman herkes güncelleme ekranında kilitlenir ama indirebileceği
+        bir sürüm yoktur — <code>forceUpdate</code> da açıksa uygulama tamamen
+        kullanılamaz hale gelir.
+      </p>
+
+      <h2>Süreli indirim: kampanya kimliği</h2>
+      <p>
+        <code>offerCampaignId</code> kullanıcı sayaçlarının anahtarıdır. Kaç kez
+        gösterildiği ve en son ne zaman gösterildiği bu kimliğe bağlı tutulur.
+      </p>
+      <ul>
+        <li><b>Yeni kampanya başlatıyorsan</b> kimliği değiştir — herkes teklifi
+          yeniden görmeye başlar.</li>
+        <li><b>Mevcut kampanyanın metnini/süresini düzeltiyorsan</b> kimliğe
+          dokunma — yoksa teklifi görüp kapatmış olan herkes tekrar görür.</li>
+      </ul>
+
+      <h2>Değişiklik ne zaman cihazlara ulaşır?</h2>
+      <p>
+        <b>Kullanıcı uygulamayı tamamen kapatıp yeniden açtığında.</b>
+        Başka bir an yok.
+      </p>
+      <p>
+        Uygulama ayarları yalnızca açılışta bir kez çeker. Arka planda duran
+        bir uygulama hiçbir şey yenilemez; kullanıcı uygulamaya geri dönse
+        bile eski ayarlarla çalışmaya devam eder. Uygulama listesinden
+        kaydırıp kapatması, sonra tekrar açması gerekir.
+      </p>
+      <p class="warn">
+        Pratikte bu şu demek: bir değişikliği yayınladıktan sonra
+        kullanıcıların büyük kısmına ulaşması <b>saatler, hatta günler</b>
+        alabilir. Acil bir düzeltme yapıyorsan bunu hesaba kat.
+      </p>
+
+      <h2>Nereden başlamalı? (ilk kez kullanıyorsan)</h2>
+      <p>
+        Bu panel tek bir ortama yazar ve o ortam <b>canlı uygulamadır</b>.
+        Test ortamı, kademeli yayın veya belirli kullanıcıya gönderme yok.
+        Yayınla dediğin an bütün kullanıcılar için geçerlidir.
+      </p>
+      <p>Bu yüzden güvenli sıra şudur:</p>
+      <ol>
+        <li>Değiştireceğin <b>tek bir alanı</b> doldur. Aynı anda birden
+          fazla şey değiştirme — bir sorun çıkarsa hangisi olduğunu
+          bilemezsin.</li>
+        <li>Yayınlamadan önce <b>Yenile</b>'ye basabilirsin: yazdıkların
+          gider, canlıdaki değerler geri gelir. Vazgeçmenin yolu budur.</li>
+        <li><b>Bu bölümü yayınla</b>'ya bas. Sadece o bölümün anahtarları
+          gönderilir, diğerlerine dokunulmaz.</li>
+        <li><b>Kendi telefonunda dene:</b> uygulamayı listeden kaydırıp
+          tamamen kapat, sonra yeniden aç. Değişikliği göremiyorsan
+          yayınlanmamış demektir — panelde <b>Yenile</b>'ye basıp değerin
+          gerçekten orada olduğunu kontrol et.</li>
+        <li>Beğenmediysen alanı boşalt ve tekrar yayınla; uygulama kendi
+          varsayılanına döner.</li>
+      </ol>
+      <p class="warn">
+        Yayınladıktan sonra eski değeri geri almanın otomatik yolu yoktur.
+        Önemli bir alanı değiştirmeden önce eski değeri bir yere not et.
+      </p>
+
+      <h2>“HENÜZ ÇALIŞMIYOR” yazan alanlar</h2>
+      <p>
+        Bazı alanların üstünde turuncu bir <b>HENÜZ ÇALIŞMIYOR</b> etiketi ve
+        gri bir kutu görürsün. Bunlar panele hazırlanmış ama uygulamanın
+        <em>henüz okumadığı</em> ayarlardır: doldursan da hiçbir şey olmaz.
+      </p>
+      <p>
+        Bu yüzden yazılamaz hâle getirildiler. Daha önce normal görünüyorlardı
+        ve bu tehlikeliydi — örneğin “reklamları kapat” dediğini sanıp
+        reklamların açık kalması mümkündü. Etiketin yanındaki not, o ayarın
+        yerine şu an neyin geçerli olduğunu söyler.
+      </p>
+    </div>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

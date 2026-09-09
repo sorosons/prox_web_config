@@ -1,0 +1,33 @@
+# Runs only this panel. Nothing here touches ports 80/443 or any other site on
+# the machine: the container publishes on 127.0.0.1 only, so it is reachable
+# from the host's own reverse proxy and from nowhere else on the network.
+services:
+  panel:
+    build: .
+    container_name: prox-config-panel
+    restart: unless-stopped
+
+    # Bound to loopback deliberately. Without the 127.0.0.1 prefix Docker
+    # publishes on every interface AND writes an iptables rule that bypasses
+    # ufw, so the panel would be openly reachable on port 8080 even with the
+    # firewall closed. Your existing nginx/Apache terminates TLS and proxies
+    # to this address.
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    environment:
+      # Read from the .env file beside this one. Never written into the image.
+      PANEL_PASSWORD: ${PANEL_PASSWORD:?set PANEL_PASSWORD in .env}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/service-account.json
+
+    volumes:
+      # Mounted read-only at run time rather than copied into the image: an
+      # image can be pushed, exported or inspected layer by layer, and this
+      # file administers the entire Firebase project.
+      - ${SERVICE_ACCOUNT_PATH:?set SERVICE_ACCOUNT_PATH in .env}:/run/secrets/service-account.json:ro
+
+    # A compromised panel process should not be able to write anywhere.
+    read_only: true
+    security_opt:
+      - no-new-privileges:true

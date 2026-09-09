@@ -1,0 +1,19 @@
+{
+  "name": "prox-remote-config-panel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Admin panel for the Prox app's Firebase Remote Config",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "firebase-admin": "^12.7.0",
+    "express-rate-limit": "^7.4.0"
+  }
+}

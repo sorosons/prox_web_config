@@ -1,0 +1,6 @@
+node_modules/
+# Never commit the Firebase service account: it grants control of the project.
+*service-account*.json
+*.credentials.json
+.env
+!.env.example

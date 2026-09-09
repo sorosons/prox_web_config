@@ -1,0 +1,524 @@
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #16181d;
+  --muted: #6b7280;
+  --line: #e3e6ea;
+  --accent: #128c7e;
+  --accent-ink: #ffffff;
+  --warn-bg: #fff8e6;
+  --warn-line: #f0d089;
+  --err: #c0392b;
+  --ok: #1e7d51;
+  --code-bg: #f0f2f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --card: #1c1f25;
+    --ink: #e8eaed;
+    --muted: #9aa1ab;
+    --line: #2c313a;
+    --accent: #25b39f;
+    --accent-ink: #06231f;
+    --warn-bg: #2a2417;
+    --warn-line: #5c4c22;
+    --err: #ef6a5c;
+    --ok: #4ec78e;
+    --code-bg: #24282f;
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* The [hidden] attribute is only `display: none` at the UA-stylesheet level,
+   so any later `display` rule silently outranks it -- .gate's `display: grid`
+   did exactly that, leaving the login card painted over the signed-in panel.
+   Restate it with enough weight to win. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 17px; margin: 28px 0 10px; }
+h3 { font-size: 15px; margin: 22px 0 8px; }
+
+.muted { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
+.err { color: var(--err); font-size: 13px; }
+
+/* ------------------------------- login -------------------------------- */
+
+.gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.card label {
+  display: block;
+  margin: 20px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ------------------------------- shell -------------------------------- */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px max(20px, calc((100% - 860px) / 2));
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.headActions { display: flex; gap: 8px; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 max(20px, calc((100% - 860px) / 2));
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 20px 140px;
+}
+
+/* ------------------------------ controls ------------------------------ */
+
+input[type="text"], input[type="password"], input[type="number"], textarea, select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+textarea { min-height: 80px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+button {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover { filter: brightness(1.06); }
+button:disabled { opacity: .5; cursor: default; filter: none; }
+
+button.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+/* ------------------------------- groups ------------------------------- */
+
+.group {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.group > h2 { margin-top: 0; }
+
+.field { padding: 14px 0; border-top: 1px solid var(--line); }
+.field:first-of-type { border-top: none; }
+
+.field label.name {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.field .key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.field .help { font-size: 13px; color: var(--muted); margin: 0 0 9px; }
+
+.field .fallback {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.field .fieldErr { color: var(--err); font-size: 12px; margin-top: 6px; }
+
+.notice, .warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.warn { margin: 14px 0; }
+
+/* ------------------------------ sticky bar ---------------------------- */
+
+/* Sits above the content rather than floating over it: a translucent bar
+   was covering the last field, which is where the publish button is most
+   likely to be needed. */
+.stickyBar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  margin: 8px -20px 0;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, .07);
+}
+
+.status { font-size: 13px; }
+.status.ok { color: var(--ok); }
+.status.bad { color: var(--err); white-space: pre-wrap; }
+
+/* -------------------------------- docs -------------------------------- */
+
+.doc { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 24px; }
+.doc h2:first-child { margin-top: 0; }
+
+pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+pre {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
+pre code { background: none; padding: 0; }
+
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; }
+
+.ruleTable td:first-child { white-space: nowrap; font-weight: 600; }
+
+.docField {
+  border-top: 1px solid var(--line);
+  padding: 14px 0;
+}
+.docField:first-child { border-top: none; }
+.docField h3 { margin: 0 0 4px; }
+.docField p { margin: 4px 0; font-size: 13px; }
+
+.protected { margin-top: 24px; font-size: 13px; }
+.protected summary { cursor: pointer; font-weight: 600; }
+
+.groupHead h2 { margin-bottom: 0; }
+
+/* Each section ends with its own publish/reset pair and its own status line,
+   so the operator never has to look elsewhere to find out what happened. */
+.groupFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line, #e5e7eb);
+}
+.groupFoot .status { font-size: 13px; }
+
+button.small {
+  font-size: 13px;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+
+/* --------------------------- section tabs ---------------------------- */
+/* Ten sections stacked made a very long page. They are now a list on the
+   left with one section shown at a time. */
+
+.editLayout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.groupTabs {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: sticky;
+  top: 16px;
+}
+
+.sideTab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  color: var(--muted);
+  padding: 9px 12px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.sideTab:hover { background: var(--card); color: var(--ink); }
+.sideTab.active {
+  background: var(--card);
+  color: var(--ink);
+  border-left-color: var(--accent);
+}
+
+.sideTabName { min-width: 0; }
+
+/* How many keys in that section are set. Lets the operator see what is
+   configured without opening all ten. */
+.sideTabCount {
+  flex-shrink: 0;
+  min-width: 20px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* One section at a time, so it no longer needs a bottom margin. */
+.editLayout .group { margin-bottom: 0; }
+
+/* Below this width the sidebar becomes a scrollable strip above the fields. */
+@media (max-width: 760px) {
+  .editLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .groupTabs {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 4px;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sideTab {
+    width: auto;
+    flex-shrink: 0;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 8px 8px 0 0;
+    white-space: nowrap;
+  }
+  .sideTab.active { border-left: none; border-bottom-color: var(--accent); }
+}
+
+/* A key the app does not read yet.
+   Deliberately loud. The whole failure this guards against is an operator
+   changing something, seeing no warning, and believing it took effect. */
+.field.inert {
+  opacity: 0.62;
+  border-left: 3px solid #b45309;
+  padding-left: 12px;
+}
+
+.field.inert .inert-badge {
+  margin: 4px 0 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #7c2d12;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.field.inert input,
+.field.inert textarea,
+.field.inert select {
+  cursor: not-allowed;
+  background: #f3f4f6;
+}
+
+/* ------------------- keys the app does not read yet ------------------- */
+
+.notWired {
+  margin: 4px 0 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.notWiredBanner {
+  margin: 12px 0 4px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sideTabSoon,
+.soonTag {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--warn-line);
+  color: #6b4c00;
+}
+
+.soonTag { margin-left: 8px; }
+
+/* ----------------------- plan pick-and-order ------------------------- */
+
+.planPicker {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.planRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+  cursor: grab;
+}
+.planRow:first-child { border-top: none; }
+.planRow.off { background: var(--bg); color: var(--muted); }
+.planRow.dragging { opacity: 0.45; }
+
+.planName {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+}
+
+button.tiny {
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+button.tiny:disabled { opacity: 0.3; cursor: default; }
+
+.planPicker .fallback {
+  margin: 0;
+  padding: 9px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+/* A warning about the combination of values, not one field. */
+.liveWarn {
+  margin: 12px 0 4px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.platformHead {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+.planPicker > .platformHead:first-child { border-top: none; }
+
+.planRow.addRow { gap: 8px; cursor: default; }
+.planRow.addRow input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 5px 9px;
+  font-size: 13px;
+}
+
+.status.dirty { color: #8a6d00; font-weight: 600; }
+
+/* A secret field: the input plus its reveal toggle on one line. */
+.maskedRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.maskedRow input { flex: 1; min-width: 0; margin: 0; }
