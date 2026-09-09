@@ -10,23 +10,43 @@ anahtar okunabilir — o anahtar da tüm projeyi yönetme yetkisi verir. Bu yüz
 kimlik bilgisi bu süreçte durur; tarayıcı sadece bu sunucunun `/api`'siyle
 konuşur.
 
+## Hangi Firebase projesine yazıyor
+
+Hedef proje koda gömülü değil: sunucu, `SERVICE_ACCOUNT_PATH` ile verdiğin
+servis hesabı JSON'unun `project_id` alanı neyse oraya yazar. Bu panel
+**prox** için, yani `waforall-2024` projesi için yapılandırılmalı. Pio ayrı
+bir projede (`waforall-new-design`) ve anahtar kümesi birebir aynı değil —
+Pio'nun servis hesabıyla bu paneli çalıştırırsan yanlış uygulamayı
+yönetirsin.
+
+`keys.js` ve testler prox'un `lib/app/helpers/configs_helper.dart` dosyasına
+göre doğrulanır; depo `~/StudioProjects/prox` ile yan yana durduğunda testler
+onu kendisi bulur.
+
 ## Bu panel neye dokunamaz
 
-Sunucu, `keys.js` içindeki listenin dışındaki hiçbir anahtarı yazmaz. Yani
-şunlar bu panelden **erişilemez** ve Firebase konsolunda kalır:
+Sunucu, `keys.js` içindeki listenin dışındaki hiçbir anahtarı yazmaz; yazma
+isteği gelirse 400 ile reddeder. Salt okunur kalanlar (`PROTECTED`):
 
 | Anahtar | Neden dışarıda |
 |---|---|
-| `isAllFeatureClosed` | Tüm özellikleri kapatan ana anahtar |
-| `appVersion` | Sürüm bazlı kapatmanın yarısı |
-| `appBuildNumber` | Sürüm bazlı kapatmanın yarısı |
-| `purchaseProductIds` | Abonelik ürün kimlikleri |
-| `geminiApiKey` | Gizli anahtar |
 | `oneSignalRestApiKey` | Gizli anahtar |
+| `verification_code` | Doğrulama kodu ekranı; konsoldan yönetiliyor |
+| `externalId` | OneSignal dış kimliği; cihaz başına, elle değiştirilmez |
 
-Bildirim metni değiştiren birinin yanlış tıkla tüm uygulamayı kapatabilmesi
-istenmeyecek bir şey. Panel bu anahtarları sadece **okur** ve durumlarını
-gösterir; yazma isteği gelirse 400 ile reddeder.
+**Dikkat — bu liste eskiden daha uzundu.** `isAllFeatureClosed`, `appVersion`,
+`appBuildNumber`, `purchaseProductIds` ve `geminiApiKey` artık panelden
+**yazılabiliyor**; sonradan bilerek eklendiler ki sunum modu ve ürün listesi
+sürüm çıkmadan yönetilebilsin. Yani panel, uygulamanın görünümünü ve neyin
+satıldığını değiştirebilir:
+
+- `purchaseProductIds` boşaltılırsa abonelik ekranı bomboş açılır ve hiçbir
+  şey satılamaz.
+- `isAllFeatureClosed` sunum moduna geçirir (sekmeler değişir). Uygulamayı
+  kapatmaz, veri silmez, `false` ile geri döner.
+
+Her birinin kendi açıklamasında bu uyarı yazılıdır. Panel parolasını yalnızca
+bu sonuçları üstlenebilecek kişilere ver.
 
 Ayrıca yayınlama sırasında panel, canlı şablonu okuyup **sadece kendi
 anahtarlarını** değiştirir. Firebase konsolundan elle eklediğin bir anahtar

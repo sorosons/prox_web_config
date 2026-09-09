@@ -38,6 +38,11 @@ const ID_LIST = 'idlist';    // comma-separated ids, order is meaningful
 const CHOICE = 'choice';     // one of field.options
 const EMAIL = 'email';       // mailto: target for the support link
 const PRODUCT_IDS = 'productids'; // {"ios": [...], "android": [...]}
+// Free-form JSON object. JSON_MAP is not usable for these: it requires either
+// language-code keys or (with anyKeys) flat string values, and a demo-chat
+// payload is neither -- it nests an array of message objects. TEXT would take
+// an unparseable value and the app would throw on jsonDecode at startup.
+const JSON_OBJ = 'jsonobj';
 
 const FIELDS = [
   // ------------------------- Pairing-code notification -------------------------
@@ -544,7 +549,7 @@ const FIELDS = [
       ['lifetime_offer', 'Ömür Boyu İNDİRİMLİ — lifetime_offer'],
     ],
     label: 'İndirimli ürün kimliği',
-    fallback: 'mağazadaki en uzun süreli plan',
+    fallback: '"std_oneyear" — uygulamaya gomulu yillik plan',
     help:
       'Teklif ekranında satılacak ürün. Boş bırakırsan uygulama mağazadaki ' +
       'en uzun süreli planı kullanır — yani indirim OLMAZ, sadece geri ' +
@@ -803,6 +808,10 @@ const FIELDS = [
   // ---------------------------- Legal links ----------------------------
   {
     key: 'termsUrl',
+    inert: 'prox bu anahtari okumuyor; kullanim kosullari baglantisi uygulamaya gomulu.',
+    // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
+    // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
+    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Kullanım koşulları bağlantısı',
@@ -811,6 +820,10 @@ const FIELDS = [
   },
   {
     key: 'privacyUrl',
+    inert: 'prox bu anahtari okumuyor; gizlilik politikasi baglantisi uygulamaya gomulu.',
+    // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
+    // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
+    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Gizlilik politikası bağlantısı',
@@ -819,6 +832,10 @@ const FIELDS = [
   },
   {
     key: 'eulaUrl',
+    inert: 'prox bu anahtari okumuyor; EULA baglantisi uygulamaya gomulu.',
+    // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
+    // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
+    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Lisans sözleşmesi (EULA) bağlantısı',
@@ -987,6 +1004,112 @@ const FIELDS = [
       'Sadece ekran ilk açıldığındaki seçimi belirler. Kullanıcı bir plana ' +
       'dokunduktan sonra bu ayarın etkisi kalmaz.',
   },
+
+  // ---------------------------------------------------------------------
+  // prox (waforall-2024) tarafinda okunan, Pio'da bulunmayan anahtarlar.
+  // ---------------------------------------------------------------------
+  {
+    key: 'showWebviewAndStatus',
+    type: TRISTATE,
+    group: 'presentation',
+    label: 'WhatsApp Web sekmesini goster',
+    fallback: 'kapali — sekme yerine Ayarlar acilir',
+    help:
+      'prox\'un kendi surum bazli inceleme kapisi. Acikken WhatsApp Web '
+      + 'sekmesi gorunur, kapaliyken o sekmede Ayarlar acilir.',
+    effect:
+      'TEK BASINA YETMEZ — yukaridaki "hedef surum" ve "hedef build '
+      + 'numarasi" calisan surumle ESLESMEMELI. Ikisi de eslesirse sekme '
+      + 'yine gizlenir. Inceleme icin gonderilen build\'i hedefleyip diger '
+      + 'herkese acik birakmak icin var.',
+  },
+  {
+    key: 'limitShowingAds',
+    type: TRISTATE,
+    group: 'ads',
+    label: 'Reklam gosterimini sinirla',
+    fallback: 'kapali — reklamlar normal sikliginda',
+    help: 'Acikken uygulama reklamlari daha seyrek gosterir.',
+    effect: 'Reklamlari tamamen kapatmaz; sadece sikligi azaltir.',
+  },
+  {
+    key: 'adsDemoList',
+    type: JSON_OBJ,
+    group: 'ads',
+    multiline: true,
+    label: 'Reklam demo sohbeti',
+    fallback: 'yok — demo ekrani bos acilir',
+    help:
+      'Reklam tanitim ekranindaki ornek sohbet. Sekli: '
+      + '{"name":"...","profileUrl":"...","lastSeen":"...","number":"...",'
+      + '"messages":[...]}. Uygulama bunu jsonDecode ile okur.',
+    effect:
+      'Gecersiz JSON yazarsan uygulama bu ekrani acarken hata verir — '
+      + 'panel bu yuzden yazmadan once JSON\'i dogrular.',
+  },
+  {
+    key: 'subscriptionBenefitText1',
+    type: TEXT,
+    group: 'paywall',
+    label: 'Abonelik faydasi 1',
+    fallback: '"Unlock Figlet Fonts"',
+    help: 'Abonelik ekranindaki birinci madde.',
+    effect:
+      'Sadece sunum modu KAPALIYKEN gecerli. Sunum modu acikken uygulama '
+      + 'kendi sabit metnini kullanir ve buraya yazdigin gorunmez.',
+  },
+  {
+    key: 'subscriptionBenefitText2',
+    type: TEXT,
+    group: 'paywall',
+    label: 'Abonelik faydasi 2',
+    fallback: '"Unlock Video Editor"',
+    help: 'Abonelik ekranindaki ikinci madde.',
+    effect: 'Sadece sunum modu KAPALIYKEN gecerli.',
+  },
+  {
+    key: 'subscriptionBenefitText3',
+    type: TEXT,
+    group: 'paywall',
+    label: 'Abonelik faydasi 3',
+    fallback: '"Unlimited Access to all Features"',
+    help: 'Abonelik ekranindaki ucuncu madde.',
+    effect: 'Sadece sunum modu KAPALIYKEN gecerli.',
+  },
+  {
+    key: 'viewOnceVideoLink',
+    type: URL,
+    group: 'guide',
+    label: 'Tek seferlik medya rehber videosu (prox)',
+    fallback: 'yok — rehber videosu acilmaz',
+    help:
+      'prox\'un okudugu anahtar bu. Ayni gruptaki viewOnceGuideUrl Pio\'nun '
+      + 'anahtari; prox onu OKUMUYOR, degistirmek prox\'ta hicbir sey yapmaz.',
+    effect: 'Bos birakirsan rehber videosu acilmaz.',
+  },
+  {
+    key: 'youtubeVideoUrl',
+    type: URL,
+    group: 'guide',
+    label: 'YouTube tanitim videosu',
+    fallback: 'yok — video gosterilmez',
+    help: 'Uygulama icinde acilan YouTube baglantisi.',
+    effect: 'Bos birakirsan video alani gosterilmez.',
+  },
+  {
+    key: 'activeWebDetails',
+    inert: 'proxta yalnizca varsayilanlar listesinde duruyor; hicbir getter okumuyor.',
+    type: TRISTATE,
+    group: 'presentation',
+    notWired: true,
+    label: 'Web detaylari (kullanilmiyor)',
+    fallback: 'yok',
+    help:
+      'prox\'ta sabiti tanimli ama configs_helper.dart icinde bir getter\'i '
+      + 'yok — hicbir yerde okunmuyor. Yayinlamak cihazda hicbir sey '
+      + 'degistirmez. Kod tarafinda okunur hale gelirse bu isaret kalkmali.',
+    effect: 'Su an hicbir etkisi yok.',
+  },
 ];
 
 /** Keys this panel must never touch, with the reason. Used for the UI notice. */
@@ -1025,4 +1148,5 @@ module.exports = {
   CHOICE,
   EMAIL,
   PRODUCT_IDS,
+  JSON_OBJ,
 };

@@ -40,6 +40,7 @@ const {
   CHOICE,
   EMAIL,
   PRODUCT_IDS,
+  JSON_OBJ,
 } = require('./keys');
 
 const ALLOWED = new Set(FIELDS.map((f) => f.key));
@@ -265,6 +266,24 @@ function validate(field, raw) {
         return { error: `${name}: "tr" veya "pt_BR" gibi bir dil kodu yaz` };
       }
       return { value: str };
+    }
+
+    // Free-form JSON object: parse-checked only. The shape belongs to the app
+    // (adsDemoList nests a message array), so validating it further here would
+    // mean this panel and the Dart model drifting apart silently. Parsing is
+    // the part that matters -- an unparseable value makes the app throw on
+    // jsonDecode, and that is exactly what must not reach a device.
+    case JSON_OBJ: {
+      let parsed;
+      try {
+        parsed = JSON.parse(str);
+      } catch (e) {
+        return { error: `${name}: geçerli JSON değil (${e.message})` };
+      }
+      if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { error: `${name}: JSON nesnesi olmalı, örn. { "name": "…" }` };
+      }
+      return { value: JSON.stringify(parsed) };
     }
 
     case JSON_MAP: {

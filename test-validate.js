@@ -94,7 +94,7 @@ check('the presentation-mode tab list matches the app', () => {
   const view = path.join(
     __dirname,
     '..',
-    'Prox_latest',
+    'prox',
     'lib/features/presentation/pages/main/views/main_view.dart'
   );
   if (!fs.existsSync(view)) {
@@ -232,6 +232,7 @@ check('every field type is one the server can validate', () => {
   const KNOWN = new Set([
     'tristate', 'text', 'int', 'jsonmap', 'lang',
     'version', 'url', 'id', 'idlist', 'choice', 'productids', 'email',
+    'jsonobj',
   ]);
   for (const f of FIELDS) {
     assert.ok(KNOWN.has(f.type), `${f.key} has unknown type "${f.type}"`);
@@ -252,22 +253,35 @@ check('notWired marks exactly the keys the app has no getter for', () => {
   // does not. Checked against the app when its source is beside this one.
   const fs = require('fs');
   const path = require('path');
-  const helper = path.join(
-    __dirname,
-    '..',
-    'Prox_latest',
-    'lib/features/data/helpers/configs_helper.dart'
+  // Checked against the app this panel actually publishes to. That is prox
+  // (Firebase project waforall-2024), not Pio (waforall-new-design) -- they
+  // are separate projects with diverging key sets, and validating against the
+  // wrong one is how notWired goes stale in the direction that hurts: a key
+  // the panel promises works, and does nothing on the device.
+  const CANDIDATES = [
+    // prox, two levels up from .references/pio_remote_config
+    {
+      helper: path.join(__dirname, '..', 'prox', 'lib/app/helpers/configs_helper.dart'),
+      constants: path.join(__dirname, '..', 'prox', 'lib/app/helpers/constants.dart'),
+    },
+    {
+      helper: path.join(__dirname, '..', 'prox', 'lib/app/helpers/configs_helper.dart'),
+      constants: path.join(__dirname, '..', 'prox', 'lib/app/helpers/constants.dart'),
+    },
+    // Pio, beside this repo
+    {
+      helper: path.join(__dirname, '..', 'prox', '.references', 'Pio_latest', 'lib/features/data/helpers/configs_helper.dart'),
+      constants: path.join(__dirname, '..', 'prox', '.references', 'Pio_latest', 'lib/core/constants/constants.dart'),
+    },
+  ];
+  const found = CANDIDATES.find(
+    (c) => fs.existsSync(c.helper) && fs.existsSync(c.constants)
   );
-  const constants = path.join(
-    __dirname,
-    '..',
-    'Prox_latest',
-    'lib/core/constants/constants.dart'
-  );
-  if (!fs.existsSync(helper) || !fs.existsSync(constants)) {
+  if (!found) {
     console.log('      (uygulama deposu yok, atlandı)');
     return;
   }
+  const { helper, constants } = found;
 
   // Constants.foo -> the actual Remote Config key string.
   const names = {};
@@ -276,9 +290,16 @@ check('notWired marks exactly the keys the app has no getter for', () => {
   let m;
   while ((m = re.exec(src))) names[m[1]] = m[2];
 
+  // Only a getter counts as "the app reads it". A key listed in the defaults
+  // map is registered with Remote Config but never fetched by anything, so
+  // publishing it changes nothing on a device -- exactly what notWired means.
+  // Matching every Constants.X in the file counted those defaults as reads.
   const read = new Set();
   const helperSrc = fs.readFileSync(helper, 'utf8');
-  const re2 = /Constants\.(\w+)/g;
+  // Both reading styles count: the raw remoteConfig.getX(Constants.foo) and
+  // the tri-state reader family (_flag/_str/_posInt/...) that replaced it.
+  // Matching only the raw form reported every converted getter as missing.
+  const re2 = /(?:remoteConfig\.get\w+|_(?:flag|flagOrNull|str|posInt|nonNegInt|localized|idList|stringMap|url))\(\s*Constants\.(\w+)/g;
   while ((m = re2.exec(helperSrc))) {
     if (names[m[1]]) read.add(names[m[1]]);
   }
@@ -402,9 +423,9 @@ check('the offer product must be one of the listed ids', () => {
   // the panel, from a campaign nobody had switched on.
   okValue('offerProductId', '6_month', '6_month');
   okValue('offerProductId', 'lifetime_offer', 'lifetime_offer');
-  rejects('offerProductId', 'prox.premium.yearly'); // plausible, but not ours
+  rejects('offerProductId', 'pio.premium.yearly'); // plausible, but not ours
   rejects('offerProductId', 'monthy'); // one letter out
-  rejects('offerProductId', 'prox premium');
+  rejects('offerProductId', 'pio premium');
 });
 
 check('a choice field rejects anything off its own list', () => {
@@ -491,7 +512,7 @@ check('the contact email must be a real address', () => {
   rejects('linkEmail', 'destek');
   rejects('linkEmail', 'destek@');
   rejects('linkEmail', 'destek @prox.app');
-  rejects('linkEmail', 'destek@prox');
+  rejects('linkEmail', 'destek@pio');
 });
 
 check('tristate takes only true/false', () => {

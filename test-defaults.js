@@ -20,8 +20,28 @@ const fs = require('fs');
 const path = require('path');
 const { FIELDS } = require('./keys.js');
 
-const APP = '/Users/rotenbergtech/StudioProjects/Prox_latest';
-const CONFIGS = path.join(APP, 'lib/features/data/helpers/configs_helper.dart');
+// The app this panel publishes to. prox (Firebase waforall-2024) sits two
+// levels up; Pio (waforall-new-design) sits beside this repo. Their source
+// layouts differ, so each candidate carries its own paths rather than a single
+// APP root -- the previous absolute path pointed at one developer's machine
+// and made these checks silently skip everywhere else.
+const CANDIDATES = [
+  {
+    root: path.join(__dirname, '..', 'prox'),
+    configs: 'lib/app/helpers/configs_helper.dart',
+    constants: 'lib/app/helpers/constants.dart',
+  },
+  {
+    root: path.join(__dirname, '..', 'prox', '.references', 'Pio_latest'),
+    configs: 'lib/features/data/helpers/configs_helper.dart',
+    constants: 'lib/core/constants/constants.dart',
+  },
+];
+const APP_SRC =
+  CANDIDATES.find((c) => fs.existsSync(path.join(c.root, c.configs))) || CANDIDATES[0];
+const APP = APP_SRC.root;
+const CONFIGS = path.join(APP, APP_SRC.configs);
+const CONSTANTS = path.join(APP, APP_SRC.constants);
 
 let failures = 0;
 let checks = 0;
@@ -110,7 +130,37 @@ function appDefault(key) {
   if (new RegExp('Constants\\.' + key + '\\b').test(src)) {
     return { kind: 'computed' };
   }
+  // Last resort: the Dart constant need not be spelled like the Remote Config
+  // key it carries. prox reads "purchaseProductIds" through a constant named
+  // `sharedPurchaseIds`, so every name-equals-key branch above misses it and
+  // a live key gets reported as having no default at all.
+  for (const name of constNamesFor(key)) {
+    if (new RegExp('Constants\\.' + name + '\\b').test(src)) {
+      return { kind: 'computed' };
+    }
+  }
   return null;
+}
+
+// Remote Config key -> the Dart constant name(s) that hold it.
+let CONST_BY_VALUE = null;
+function constNamesFor(key) {
+  if (!CONST_BY_VALUE) {
+    CONST_BY_VALUE = new Map();
+    let csrc = '';
+    try {
+      csrc = fs.readFileSync(CONSTANTS, 'utf8');
+    } catch (e) {
+      csrc = '';
+    }
+    const re = /static const String\s+(\w+)\s*=\s*['"]([^'"]+)['"]/g;
+    let m;
+    while ((m = re.exec(csrc))) {
+      if (!CONST_BY_VALUE.has(m[2])) CONST_BY_VALUE.set(m[2], []);
+      CONST_BY_VALUE.get(m[2]).push(m[1]);
+    }
+  }
+  return CONST_BY_VALUE.get(key) || [];
 }
 
 // --- numbers: the panel prints the figure, so it must be the real one ---

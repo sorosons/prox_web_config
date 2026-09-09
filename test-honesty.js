@@ -16,7 +16,27 @@ const fs = require('fs');
 const path = require('path');
 const { FIELDS, PROTECTED } = require('./keys.js');
 
-const APP = '/Users/rotenbergtech/StudioProjects/Prox_latest';
+// The app this panel publishes to. prox (Firebase waforall-2024) sits two
+// levels up; Pio (waforall-new-design) sits beside this repo. Their source
+// layouts differ, so each candidate carries its own paths rather than a single
+// APP root -- the previous absolute path pointed at one developer's machine
+// and made these checks silently skip everywhere else.
+const CANDIDATES = [
+  {
+    root: path.join(__dirname, '..', 'prox'),
+    configs: 'lib/app/helpers/configs_helper.dart',
+    constants: 'lib/app/helpers/constants.dart',
+  },
+  {
+    root: path.join(__dirname, '..', 'prox', '.references', 'Pio_latest'),
+    configs: 'lib/features/data/helpers/configs_helper.dart',
+    constants: 'lib/core/constants/constants.dart',
+  },
+];
+const APP_SRC =
+  CANDIDATES.find((c) => fs.existsSync(path.join(c.root, c.configs))) || CANDIDATES[0];
+const APP = APP_SRC.root;
+
 
 let failures = 0;
 let checks = 0;
@@ -32,9 +52,15 @@ function ok(name, condition, detail) {
   }
 }
 
+// Callers still name Pio's paths; map them to whichever app was found.
+const REL = {
+  'lib/features/data/helpers/configs_helper.dart': 'configs',
+  'lib/core/constants/constants.dart': 'constants',
+};
+
 function read(rel) {
   try {
-    return fs.readFileSync(path.join(APP, rel), 'utf8');
+    return fs.readFileSync(path.join(APP, APP_SRC[REL[rel]] || rel), 'utf8');
   } catch (e) {
     return null;
   }
@@ -54,9 +80,23 @@ if (constants === null || configs === null) {
 // that name. Either alone is not enough: a constant nobody reads is dead, and
 // a getter is what actually pulls the value out of Remote Config.
 function isWired(key) {
-  const named = new RegExp('=\\s*"' + key + '"').test(constants);
-  const read_ = new RegExp('Constants\\.' + key + '\\b').test(configs);
-  return named && read_;
+  // Resolve the Dart constant NAME that carries this Remote Config key, then
+  // look for a getter reaching for that name. Matching `Constants.<key>`
+  // directly assumed the two are spelled the same; prox reads the key
+  // "purchaseProductIds" through a constant called `sharedPurchaseIds`, and
+  // that assumption reported a live key as dead.
+  const re = /static const String\s+(\w+)\s*=\s*['"]([^'"]+)['"]/g;
+  let m;
+  const constNames = [];
+  while ((m = re.exec(constants))) {
+    if (m[2] === key) constNames.push(m[1]);
+  }
+  if (!constNames.length) return false;
+  return constNames.some((n) =>
+    new RegExp(
+      '(?:remoteConfig\\.get\\w+|_(?:flag|flagOrNull|str|posInt|nonNegInt|localized|idList|stringMap|url))\\(\\s*Constants\\.' + n + '\\b'
+    ).test(configs)
+  );
 }
 
 const wrong = [];
