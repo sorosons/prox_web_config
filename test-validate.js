@@ -314,9 +314,15 @@ check('notWired marks exactly the keys the app has no getter for', () => {
   }
 });
 
-check('the delay that may legitimately be zero allows zero', () => {
-  // min:0 is load-bearing here and easy to lose to a `f.min || 1`.
-  assert.strictEqual(BY_KEY.get('launchPaywallDelaySeconds').min, 0);
+check('the launch delay refuses zero, because zero means unset', () => {
+  // This used to assert min:0, when zero meant "open immediately". It does
+  // not any more: prox has always waited half a second and the key is in
+  // whole seconds, so it cannot express the value it has to preserve. The
+  // app reads 0 as "unset" and falls back to 500ms, which is exactly what
+  // leaving the field blank already does -- so offering 0 in the panel would
+  // be a second way to say nothing, indistinguishable from the first and
+  // sure to be read as "instantly".
+  assert.strictEqual(BY_KEY.get('launchPaywallDelaySeconds').min, 1);
 });
 
 // Re-implement validate() by requiring the server module's logic indirectly:
@@ -456,11 +462,18 @@ check('id lists are trimmed and canonicalised', () => {
   rejects('offerTriggerPoints', 'app open,settings');
 });
 
-check('the zero-second delay is accepted, negatives are not', () => {
-  okValue('launchPaywallDelaySeconds', '0', '0');
+check('the launch delay refuses zero and negatives alike', () => {
+  // Zero is not a delay of nothing here, it is "unset" -- which is what an
+  // empty field already says. See the min:1 check above.
+  rejects('launchPaywallDelaySeconds', '0');
   rejects('launchPaywallDelaySeconds', '-1');
+  okValue('launchPaywallDelaySeconds', '1', '1');
   // Fields that genuinely must not be zero still reject it.
   rejects('offerDurationMinutes', '0');
+  // launchPaywallMaxPerDay is the same shape: the app reads 0 as "no cap",
+  // and leaving the field blank already says that, so the panel does not
+  // offer a second way to say it.
+  rejects('launchPaywallMaxPerDay', '0');
 });
 
 check('adUnitIds is keyed by placement, not language', () => {

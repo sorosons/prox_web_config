@@ -270,7 +270,8 @@ const FIELDS = [
   {
     key: 'featureDualChatEnabled',
     notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
+    inert:
+      'prox bu isi kendi anahtariyla yapiyor: showWebviewAndStatus. Ikinci bir kapi onunla cakisirdi.',
     type: TRISTATE,
     group: 'features',
     label: 'İkili sohbet',
@@ -283,7 +284,8 @@ const FIELDS = [
   {
     key: 'featureStatusEnabled',
     notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
+    inert:
+      'prox bu isi kendi anahtariyla yapiyor: showWebviewAndStatus. Ikinci bir kapi onunla cakisirdi.',
     type: TRISTATE,
     group: 'features',
     label: 'Durum (status) özelliği',
@@ -296,7 +298,8 @@ const FIELDS = [
   {
     key: 'featureAiChatEnabled',
     notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
+    inert:
+      'prox\'ta yapay zeka sohbeti diye bir ozellik yok; kapatilacak bir sey de yok.',
     type: TRISTATE,
     group: 'features',
     label: 'Yapay zekâ sohbeti',
@@ -312,7 +315,8 @@ const FIELDS = [
   {
     key: 'aiChatDailyLimit',
     notWired: true,
-    inert: 'Yapay zeka sohbet modulu prox\'ta bulunmuyor.',
+    inert:
+      'prox\'ta yapay zeka sohbeti diye bir ozellik yok; sinirlanacak bir sey de yok.',
     type: INT,
     group: 'features',
     label: 'Günlük yapay zekâ mesaj hakkı',
@@ -349,8 +353,6 @@ const FIELDS = [
   },
   {
     key: 'freeUserChatsEnabled',
-    notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
     type: TRISTATE,
     group: 'freeAccess',
     label: 'Sohbetler',
@@ -366,8 +368,6 @@ const FIELDS = [
   },
   {
     key: 'freeUserStatusEnabled',
-    notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
     type: TRISTATE,
     group: 'freeAccess',
     label: 'Durum',
@@ -383,8 +383,6 @@ const FIELDS = [
   },
   {
     key: 'freeUserProfilesEnabled',
-    notWired: true,
-    inert: 'prox\'un sekme yapisi farkli (2 sekme); bu anahtarin karsiligi olan ekran yok.',
     type: TRISTATE,
     group: 'freeAccess',
     label: 'Profiller',
@@ -403,7 +401,8 @@ const FIELDS = [
   {
     key: 'geminiApiKey',
     notWired: true,
-    inert: 'Yapay zeka sohbet modulu prox\'ta bulunmuyor.',
+    inert:
+      'prox\'ta yapay zeka sohbeti diye bir ozellik yok. Zaten panelin yazamadigi bir sir.',
     type: TEXT,
     masked: true,
     group: 'ai',
@@ -421,7 +420,8 @@ const FIELDS = [
   {
     key: 'geminiModel',
     notWired: true,
-    inert: 'Yapay zeka sohbet modulu prox\'ta bulunmuyor.',
+    inert:
+      'prox\'ta yapay zeka sohbeti diye bir ozellik yok.',
     type: TEXT,
     group: 'ai',
     label: 'Gemini model adı',
@@ -440,7 +440,8 @@ const FIELDS = [
   {
     key: 'viewOnceGuideUrl',
     notWired: true,
-    inert: 'prox rehber videosunu viewOnceVideoLink anahtarindan okuyor; bu anahtari okumuyor.',
+    inert:
+      'prox ayni isi kendi anahtariyla yapiyor: viewOnceVideoLink. Kilavuz videosunu oradan degistir.',
     type: URL,
     group: 'guide',
     label: 'Tek görüntülük rehber videosu',
@@ -459,8 +460,6 @@ const FIELDS = [
   // -------------------------- Launch paywall ---------------------------
   {
     key: 'launchPaywallEnabled',
-    notWired: true,
-    inert: 'Acilis paywall mantigi prox\'ta yok; abonelik ekrani baska bir yoldan aciliyor.',
     type: TRISTATE,
     group: 'launchPaywall',
     label: 'Açılışta paywall göster',
@@ -474,21 +473,20 @@ const FIELDS = [
   },
   {
     key: 'launchPaywallDelaySeconds',
-    notWired: true,
-    inert: 'Acilis paywall mantigi prox\'ta yok; abonelik ekrani baska bir yoldan aciliyor.',
     type: INT,
     group: 'launchPaywall',
     label: 'Açılıştan kaç saniye sonra',
-    fallback: '6',
-    min: 0,
+    fallback: '0',
+    min: 1,
     help:
-      'Uygulama açıldıktan sonra beklenecek süre. 0 yazarsan anında açılır ve ' +
-      'kullanıcı ne olduğunu anlamadan ekranla karşılaşır.',
+      'Uygulama açıldıktan sonra beklenecek süre. Boş bırakırsan uygulamanın ' +
+      'kendi gecikmesi geçerli olur: yarım saniye. Anahtar tam saniye ' +
+      'tuttuğu için yarım saniyeyi ifade edemez, o yüzden 0 "ayarlanmamış" ' +
+      'demektir — anında açmak için 1 yaz.',
+    effect: 'boş → yarım saniye (bugünkü hâli). 1 ve üzeri → o kadar saniye.',
   },
   {
     key: 'launchPaywallMaxPerDay',
-    notWired: true,
-    inert: 'Acilis paywall mantigi prox\'ta yok; abonelik ekrani baska bir yoldan aciliyor.',
     type: INT,
     group: 'launchPaywall',
     label: 'Günde en fazla kaç kez',
@@ -500,8 +498,6 @@ const FIELDS = [
   },
   {
     key: 'launchPaywallSkipFirstRun',
-    notWired: true,
-    inert: 'Acilis paywall mantigi prox\'ta yok; abonelik ekrani baska bir yoldan aciliyor.',
     type: TRISTATE,
     group: 'launchPaywall',
     label: 'İlk açılışta gösterme',
@@ -532,8 +528,6 @@ const FIELDS = [
   },
   {
     key: 'offerCampaignId',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: ID,
     group: 'offer',
     label: 'Kampanya kimliği',
@@ -620,8 +614,6 @@ const FIELDS = [
   },
   {
     key: 'offerMaxShowsPerUser',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: INT,
     group: 'offer',
     label: 'Kullanıcı başına en fazla gösterim',
@@ -639,8 +631,6 @@ const FIELDS = [
   },
   {
     key: 'offerShowAfterSessions',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: INT,
     group: 'offer',
     label: 'Kaç oturum sonra göster',
@@ -657,8 +647,6 @@ const FIELDS = [
   },
   {
     key: 'offerCooldownHours',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: INT,
     group: 'offer',
     label: 'Gösterimler arası bekleme (saat)',
@@ -679,8 +667,6 @@ const FIELDS = [
   },
   {
     key: 'offerTriggerPoints',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: ID_LIST,
     group: 'offer',
     label: 'Nerelerde tetiklensin',
@@ -696,8 +682,6 @@ const FIELDS = [
 
   {
     key: 'offerDismissAdEnabled',
-    notWired: true,
-    inert: 'Teklif kapisi (OfferGate) prox\'a henuz portlanmadi; bu anahtari okuyan kod yok.',
     type: TRISTATE,
     group: 'offer',
     label: 'Teklif kapatılınca reklam göster',
@@ -714,8 +698,6 @@ const FIELDS = [
   // ------------------------------- Ads --------------------------------
   {
     key: 'adsEnabled',
-    notWired: true,
-    inert: 'prox\'ta reklam birimleri ad_ids_helper icinde gomulu; ads_helper bu anahtari okumuyor.',
     type: TRISTATE,
     group: 'ads',
     label: 'Reklamlar',
@@ -730,8 +712,6 @@ const FIELDS = [
   },
   {
     key: 'adUnitIds',
-    notWired: true,
-    inert: 'prox\'ta reklam birimleri ad_ids_helper icinde gomulu; ads_helper bu anahtari okumuyor.',
     type: JSON_MAP,
     group: 'ads',
     label: 'Reklam birimi kimlikleri',
@@ -744,8 +724,6 @@ const FIELDS = [
   },
   {
     key: 'interstitialFrequency',
-    notWired: true,
-    inert: 'prox\'ta reklam birimleri ad_ids_helper icinde gomulu; ads_helper bu anahtari okumuyor.',
     type: INT,
     group: 'ads',
     label: 'Geçiş reklamı sıklığı',
@@ -757,8 +735,6 @@ const FIELDS = [
   },
   {
     key: 'appOpenAdEnabled',
-    notWired: true,
-    inert: 'prox\'ta reklam birimleri ad_ids_helper icinde gomulu; ads_helper bu anahtari okumuyor.',
     type: TRISTATE,
     group: 'ads',
     label: 'Açılış reklamı',
@@ -856,10 +832,8 @@ const FIELDS = [
   // ---------------------------- Legal links ----------------------------
   {
     key: 'termsUrl',
-    inert: 'prox bu anahtari okumuyor; kullanim kosullari baglantisi uygulamaya gomulu.',
     // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
     // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
-    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Kullanım koşulları bağlantısı',
@@ -868,10 +842,8 @@ const FIELDS = [
   },
   {
     key: 'privacyUrl',
-    inert: 'prox bu anahtari okumuyor; gizlilik politikasi baglantisi uygulamaya gomulu.',
     // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
     // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
-    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Gizlilik politikası bağlantısı',
@@ -880,10 +852,8 @@ const FIELDS = [
   },
   {
     key: 'eulaUrl',
-    inert: 'prox bu anahtari okumuyor; EULA baglantisi uygulamaya gomulu.',
     // prox (waforall-2024) bu anahtari okumuyor: konsolda bir getter'i yok,
     // yayinlamak cihazda hicbir sey degistirmez. Pio'da kullaniliyor.
-    notWired: true,
     type: URL,
     group: 'legal',
     label: 'Lisans sözleşmesi (EULA) bağlantısı',
@@ -1003,8 +973,6 @@ const FIELDS = [
   },
   {
     key: 'paywallHeadline',
-    notWired: true,
-    inert: 'Abonelik ekraninda konsoldan yazilabilir bir baslik alani yok.',
     type: TEXT,
     group: 'paywall',
     label: 'Paywall başlığı',
