@@ -476,7 +476,7 @@ const FIELDS = [
     type: INT,
     group: 'launchPaywall',
     label: 'Açılıştan kaç saniye sonra',
-    fallback: '0',
+    fallback: '0 — yani uygulamanın kendi gecikmesi, yarım saniye',
     min: 1,
     help:
       'Uygulama açıldıktan sonra beklenecek süre. Boş bırakırsan uygulamanın ' +
