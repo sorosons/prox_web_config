@@ -103,6 +103,30 @@ const FIELDS = [
       'Yayınladıktan sonra kendi telefonunda mutlaka kontrol et.',
   },
 
+  {
+    key: 'linkSteps',
+    type: TEXT,
+    group: 'link',
+    label: 'Bağlanma adımları',
+    fallback:
+      'Ayarlar > Bağlı Cihazlar\'ı aç | Cihaz Bağla > Telefon numarası ile ' +
+      'bağla | Kodu yapıştır (basılı tut > Yapıştır)',
+    help:
+      'Eşleşme kartındaki numaralı adımlar. Adımları "|" ile ayır; satır ' +
+      'sonu da ayırıcı sayılır, yani listeyi alt alta yazabilirsin. ' +
+      'Numaraları sen yazmıyorsun, uygulama sırayla numaralandırır. ' +
+      'Boş bırakırsan uygulamayla gelen üç adım kullanılır ve herkes kendi ' +
+      'dilinde görür.',
+    effect:
+      'Yazdığın metin, uygulamanın çeviri sözlüğünde birebir bir anahtara ' +
+      'denk gelirse çevrilir; gelmezse TÜM dillerde yazdığın gibi görünür. ' +
+      'Yani Türkçe yazarsan İngiliz kullanıcı da Türkçe görür. ' +
+      'Adım eklemek/çıkarmak serbest — sayı sabit değil. ' +
+      'Uygulamanın kendi üç adımında "sonra bu uygulamaya dön" YOKTUR ve ' +
+      'bu bilinçli: kod kabul edilir edilmez WhatsApp\'tan çıkmak sayfayı ' +
+      '"sohbetler yükleniyor" ekranında bırakıyor.',
+  },
+
   // ---------------------------- Shared ----------------------------
   {
     key: 'notifLanguage',
