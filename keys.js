@@ -650,7 +650,7 @@ const FIELDS = [
     type: INT,
     group: 'offer',
     label: 'Gösterimler arası bekleme (saat)',
-    fallback: '12',
+    fallback: '0',
     // 0 means "no wait": the offer may reappear the next time it is
     // triggered, which is the only way to watch it more than once while
     // testing. Allowed here because the app reads this with _nonNegInt --
