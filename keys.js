@@ -458,6 +458,49 @@ const FIELDS = [
   },
 
   {
+    key: 'aiChatEnabled',
+    type: TRISTATE,
+    group: 'ai',
+    label: 'Yapay zekâ sohbeti',
+    fallback: 'açık',
+    help:
+      'Panodaki "AI Sohbet" kartını gösterir ya da gizler. Boş bırakırsan ' +
+      'açık kalır.',
+    effect:
+      'false → kart hiç görünmez ve hiçbir istek gönderilmez, yani Gemini ' +
+      'faturası da durur. Zaten başlamış sohbetler diskte kalır, kart geri ' +
+      'açıldığında yerindedir.',
+  },
+  {
+    key: 'audioEditorEnabled',
+    type: TRISTATE,
+    group: 'ai',
+    label: 'Ses editörü',
+    fallback: 'açık',
+    help:
+      'Panodaki "Ses Editörü" kartını gösterir ya da gizler. Boş bırakırsan ' +
+      'açık kalır.',
+    effect:
+      'false → kart görünmez. Kullanıcının kaydettiği sesler silinmez, ' +
+      'sadece bu ekrandan ulaşılamaz.',
+  },
+  {
+    key: 'premiumAiChatsPerDay',
+    type: INT,
+    group: 'ai',
+    label: 'Aboneye günlük sohbet hakkı',
+    fallback: '30',
+    min: 0,
+    help:
+      'Abone ve deneme kullanıcısının bir günde kaç yapay zekâ sohbeti ' +
+      'başlatabileceği. 0 yazarsan abonelere de kapanır.',
+    effect:
+      'Gemini anahtarı bizim: her mesaj o anahtarın bağlı olduğu hesaba ' +
+      'faturalanıyor. Bu yüzden abonelerde de bir tavan var — "sınırsız" ' +
+      'bir ödeme planı, üst sınırı olmayan bir fatura demek. Rakamı ' +
+      'yükseltmek doğrudan gideri yükseltir.',
+  },
+  {
     key: 'freeAiChatsPerDay',
     type: INT,
     group: 'ai',
