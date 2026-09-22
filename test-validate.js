@@ -163,9 +163,10 @@ check('the remaining secret is not writable', () => {
   // oneSignalRestApiKey has no reader in the app and no rotation story, so
   // there is nothing this panel could usefully do with it.
   //
-  // geminiApiKey left this list deliberately: the app now falls back to a
-  // baked-in key, which turns the console value into a rotation valve --
-  // the one way to replace a leaked or revoked key without a release.
+  // geminiApiKey left this list deliberately: it is the ONLY place the app
+  // gets a Gemini key from. There is no baked-in one -- this was written as
+  // though there were, and the app has never had it -- so the console value
+  // is not a rotation valve but the switch that makes the AI chat exist.
   assert.ok(!ALLOWED.has('oneSignalRestApiKey'), 'must not be writable');
 });
 
@@ -177,9 +178,19 @@ check('the Gemini key is masked in the UI', () => {
   assert.strictEqual(f.masked, true, 'must render as a password field');
   // And clearing it must be safe, or an operator tidying up would take the
   // AI chat down with no way to tell why.
+  //
+  // "Safe" cannot mean "the app falls back to its own key" -- it has none,
+  // and asserting that it did is what let the panel promise a fallback that
+  // does not exist. It means the blank state is STATED: the field says the
+  // chat is off without a key, and the app says the same thing on screen
+  // rather than failing on every message.
   assert.ok(
-    /gömülü/i.test(f.fallback),
-    'the blank state must say the app falls back to its own key'
+    /kapalı|kapali/i.test(f.fallback),
+    'the blank state must say the AI chat is off without a key'
+  );
+  assert.ok(
+    /gömülü anahtar YOK|gomulu anahtar YOK/i.test(f.help),
+    'the help must say there is no embedded key to fall back to'
   );
 });
 check('every protected key is genuinely outside the allow-list', () => {

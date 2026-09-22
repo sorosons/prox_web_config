@@ -424,28 +424,25 @@ const FIELDS = [
   // ------------------------------ Gemini -------------------------------
   {
     key: 'geminiApiKey',
-    notWired: true,
-    inert:
-      'prox\'ta yapay zeka sohbeti diye bir ozellik yok. Zaten panelin yazamadigi bir sir.',
     type: TEXT,
     masked: true,
     group: 'ai',
     label: 'Gemini API anahtarı',
-    fallback: 'uygulamaya gömülü anahtar',
+    fallback: 'boş — yapay zekâ sohbeti kapalı',
     help:
-      'Yapay zekâ sohbetinin kullandığı Google API anahtarı. Boş ' +
-      'bırakırsan uygulamayla gelen anahtar kullanılır. Burası anahtarı ' +
-      'sürüm göndermeden değiştirmek için var.',
+      'Yapay zekâ sohbetinin kullandığı Google API anahtarı. Uygulamada ' +
+      'gömülü anahtar YOK: bu alan boşsa sohbet ekranı açılır ama ' +
+      '"AI şu an kullanılamıyor" der. Anahtarı aistudio.google.com/apikey ' +
+      'adresinden alıp buraya yaz.',
     effect:
-      'Yanlış bir anahtar yazarsan yapay zekâ sohbeti çalışmaz ve Google ' +
-      '"invalid API key" döner. Alanı boşaltmak güvenlidir: uygulama kendi ' +
-      'gömülü anahtarına döner.',
+      'Boş: sohbet ekranı kendini kapalı ilan eder, hiçbir istek ' +
+      'gönderilmez. Yanlış anahtar: Google "invalid API key" döner ve ' +
+      'kullanıcı "AI şu an kullanılamıyor" görür. Doğru anahtar: sohbet ' +
+      'çalışır, ücretsiz kullanıcı günde freeAiChatsPerDay kadar ' +
+      'sohbet başlatabilir.',
   },
   {
     key: 'geminiModel',
-    notWired: true,
-    inert:
-      'prox\'ta yapay zeka sohbeti diye bir ozellik yok.',
     type: TEXT,
     group: 'ai',
     label: 'Gemini model adı',
@@ -458,6 +455,24 @@ const FIELDS = [
       'kullanıcılara açık değil" gibi. Kapanan bir model adı her mesajda ' +
       '404 demektir. Yapay zekâ sohbeti aniden çalışmayı bırakırsa ilk ' +
       'buraya güncel model adını yaz; sürüm beklemeden düzelir.',
+  },
+
+  {
+    key: 'freeAiChatsPerDay',
+    type: INT,
+    group: 'ai',
+    label: 'Ücretsiz kullanıcıya günlük sohbet hakkı',
+    fallback: '1',
+    min: 0,
+    help:
+      'Ücretsiz kullanıcının bir günde kaç yapay zekâ sohbeti ' +
+      'başlatabileceği. Abone ve deneme kullanıcıları sınırsız. 0 ' +
+      'yazarsan özellik tamamen premium olur.',
+    effect:
+      'Hakkı bitince yeni sohbet açmak premium diyaloğunu getirir; eski ' +
+      'sohbetler okunabilir kalır ama devam edilemez. İnceleme ' +
+      'gönderirken burayı yükseltmek işe yarar: günün tek sohbetini ' +
+      '"merhaba" ile harcayan bir incelemeci özelliği deneyemez.',
   },
 
   // --------------------------- Guide content ---------------------------
