@@ -323,35 +323,41 @@ const FIELDS = [
     key: 'featureAiChatEnabled',
     notWired: true,
     inert:
-      'prox\'ta yapay zeka sohbeti diye bir ozellik yok; kapatilacak bir sey de yok.',
+      'prox\'ta yapay zeka sohbeti VAR, ama bu anahtar onu yonetmiyor: ' +
+      'kartin gorunurlugu aiChatEnabled, gunluk haklar freeAiChatsPerDay ' +
+      've premiumAiChatsPerDay. Bu, Pio\'dan kalan ikinci bir kapi: ' +
+      'getter\'i var ama onu cagiran yok.',
     type: TRISTATE,
     group: 'features',
     label: 'Yapay zekâ sohbeti',
     fallback: 'açık',
     help:
-      'Gemini tarafı pahalı veya kotası dolduysa buradan kapatabilirsin. ' +
-      'Kapatmak fatura kesmenin en hızlı yolu.',
+      'Gemini pahalıysa veya kota dolduysa kapatman gereken anahtar bu ' +
+      'değil, aiChatEnabled. Buraya ne yazarsan yaz hiçbir şey olmaz.',
     effect:
-      "false → Yapay zekâ sekmesi yerinde kalır ama içinde 'kullanılamıyor' " +
-      'ekranı görünür. Gemini maliyeti aniden artarsa faturayı kesmenin ' +
-      'en hızlı yolu budur.',
+      'Hiçbir etkisi yok — ne false ne true. prox\'ta AI sohbetini kapatan ' +
+      'anahtar aiChatEnabled, ve kapatıldığında kart hiç görünmez, istek ' +
+      'de gitmez.',
   },
   {
     key: 'aiChatDailyLimit',
     notWired: true,
     inert:
-      'prox\'ta yapay zeka sohbeti diye bir ozellik yok; sinirlanacak bir sey de yok.',
+      'prox gunluk hakki iki ayri anahtarla veriyor: ucretsiz kullanici ' +
+      'icin freeAiChatsPerDay, abone icin premiumAiChatsPerDay. Bu tek ' +
+      'sayili anahtarin getter\'i var ama onu cagiran yok.',
     type: INT,
     group: 'features',
     label: 'Günlük yapay zekâ mesaj hakkı',
     fallback: '1',
     min: 1,
     help:
-      'Kullanıcı başına günlük mesaj sayısı. Boş bırakırsan sınır yoktur — ' +
-      'maliyet kontrolü istiyorsan bir sayı gir.',
+      'Maliyet kontrolü istiyorsan burası değil: freeAiChatsPerDay ve ' +
+      'premiumAiChatsPerDay. Buraya girilen sayıyı uygulama okumaz.',
     effect:
-      'Sınıra ulaşan kullanıcı ertesi güne kadar bekler. Aboneler için de ' +
-      'geçerlidir, düşük bir sayı şikâyet getirir.',
+      'Hiçbir etkisi yok. Sınırı gerçekten uygulayan iki anahtar ' +
+      'freeAiChatsPerDay (varsayılan 1) ve premiumAiChatsPerDay ' +
+      '(varsayılan 30); ikisi de 0 yapılırsa sohbet tamamen kapanır.',
   },
 
   // --------------------- Free-user access to screens ---------------------
