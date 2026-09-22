@@ -464,12 +464,15 @@ const FIELDS = [
     label: 'Yapay zekâ sohbeti',
     fallback: 'açık',
     help:
-      'Panodaki "AI Sohbet" kartını gösterir ya da gizler. Boş bırakırsan ' +
-      'açık kalır.',
+      'Panodaki "AI Sohbet" kartını NORMAL MODDA gösterir ya da gizler. ' +
+      'Sunum modu bu anahtarı dinlemez — orada kart her hâlükârda görünür. ' +
+      'Boş bırakırsan açık kalır.',
     effect:
-      'false → kart hiç görünmez ve hiçbir istek gönderilmez, yani Gemini ' +
-      'faturası da durur. Zaten başlamış sohbetler diskte kalır, kart geri ' +
-      'açıldığında yerindedir.',
+      'false → normal modda kart görünmez ve hiçbir istek gönderilmez, yani ' +
+      'Gemini faturası da durur. Sunum modunda kart yerinde kalır: o modda ' +
+      'WhatsApp özellikleri gizli olduğu için üç araç kartı ekranın tamamı, ' +
+      've incelemeciye boş bir pano göstermek ret sebebidir. Zaten başlamış ' +
+      'sohbetler diskte kalır, kart geri açıldığında yerindedir.',
   },
   {
     key: 'audioEditorEnabled',
@@ -478,11 +481,12 @@ const FIELDS = [
     label: 'Ses editörü',
     fallback: 'açık',
     help:
-      'Panodaki "Ses Editörü" kartını gösterir ya da gizler. Boş bırakırsan ' +
-      'açık kalır.',
+      'Panodaki "Ses Editörü" kartını NORMAL MODDA gösterir ya da gizler. ' +
+      'Sunum modu bu anahtarı dinlemez. Boş bırakırsan açık kalır.',
     effect:
-      'false → kart görünmez. Kullanıcının kaydettiği sesler silinmez, ' +
-      'sadece bu ekrandan ulaşılamaz.',
+      'false → normal modda kart görünmez; sunum modunda yerinde kalır. ' +
+      'Kullanıcının kaydettiği sesler silinmez, sadece bu ekrandan ' +
+      'ulaşılamaz.',
   },
   {
     key: 'videoEditorEnabled',
@@ -491,13 +495,13 @@ const FIELDS = [
     label: 'Video editörü',
     fallback: 'açık',
     help:
-      'Panodaki "Videoları Düzenle" kartını gösterir ya da gizler. Boş ' +
-      'bırakırsan açık kalır.',
+      'Panodaki "Videoları Düzenle" kartını NORMAL MODDA gösterir ya da ' +
+      'gizler. Sunum modu bu anahtarı dinlemez. Boş bırakırsan açık kalır.',
     effect:
-      'false → kart iki modda da görünmez. Sunum modunda geriye iki araç ' +
-      'kalır; incelemeye giden bir build için bunu bilerek kapat, çünkü ' +
-      "üçü içinde kullanıcının kendi medyasını düzenleyen tek özellik bu. " +
-      'Düzenlenmiş videolar silinmez, sadece bu karttan ulaşılamaz.',
+      'false → normal modda kart görünmez; sunum modunda yerinde kalır, ' +
+      'çünkü üçü içinde kullanıcının kendi medyasını düzenleyen tek özellik ' +
+      'bu ve incelemecinin göreceği tek ciddi araç odur. Düzenlenmiş ' +
+      'videolar silinmez, sadece bu karttan ulaşılamaz.',
   },
   {
     key: 'premiumAiChatsPerDay',
