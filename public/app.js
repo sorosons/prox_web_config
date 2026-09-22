@@ -103,10 +103,13 @@ const GROUPS = [
   },
   {
     id: 'ai',
-    title: 'Yapay zekâ',
+    title: 'Yapay zekâ ve araç kartları',
     blurb:
-      'Gemini anahtarı ve model adı. İkisi de boş bırakılabilir — uygulama ' +
-      'kendi gömülü değerlerini kullanır.',
+      'Gemini anahtarı, model adı ve günlük sohbet hakları. Yanında, ' +
+      'panodaki üç bağımsız aracın görünürlüğü: yapay zekâ sohbeti, ses ' +
+      'editörü ve video editörü. Anahtar boş bırakılırsa yapay zekâ ' +
+      'sohbeti açılır ve kapalı olduğunu söyler — uygulamada gömülü ' +
+      'anahtar yoktur.',
   },
   {
     id: 'guide',

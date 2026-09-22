@@ -485,6 +485,21 @@ const FIELDS = [
       'sadece bu ekrandan ulaşılamaz.',
   },
   {
+    key: 'videoEditorEnabled',
+    type: TRISTATE,
+    group: 'ai',
+    label: 'Video editörü',
+    fallback: 'açık',
+    help:
+      'Panodaki "Videoları Düzenle" kartını gösterir ya da gizler. Boş ' +
+      'bırakırsan açık kalır.',
+    effect:
+      'false → kart iki modda da görünmez. Sunum modunda geriye iki araç ' +
+      'kalır; incelemeye giden bir build için bunu bilerek kapat, çünkü ' +
+      "üçü içinde kullanıcının kendi medyasını düzenleyen tek özellik bu. " +
+      'Düzenlenmiş videolar silinmez, sadece bu karttan ulaşılamaz.',
+  },
+  {
     key: 'premiumAiChatsPerDay',
     type: INT,
     group: 'ai',
